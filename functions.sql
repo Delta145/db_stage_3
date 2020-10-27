@@ -47,6 +47,7 @@ INSERT INTO расписание(название, клиент, описани�
 	RETURN newSchedId;
 END;
 $$ LANGUAGE 'plpgsql';
+
 CREATE OR REPLACE FUNCTION copyRecipe(recipe int, client int) RETURNS INT STRICT AS $$
 DECLARE
 newRecipeId int;
