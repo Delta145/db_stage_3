@@ -1,0 +1,17 @@
+DROP TABLE любимые_расписания;
+DROP TABLE любимые_кофе;
+DROP TABLE компонент_кофе;
+DROP TABLE ингредиент;
+DROP TABLE оценка_кофе;
+DROP TABLE оценка_расписания;
+DROP TABLE оценка;
+DROP TABLE компонент_заказа;
+DROP TABLE запись_расписания;
+DROP TABLE расписание;
+DROP TABLE заказ;
+DROP TABLE десерт;
+DROP TABLE кофе;
+DROP TABLE товар;
+DROP TABLE клиент;
+DROP TABLE кофейня;
+DROP TABLE адрес;
