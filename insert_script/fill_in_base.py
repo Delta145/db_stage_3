@@ -18,7 +18,7 @@ def insert_into(table, fields, values):
 def generate_random_email(already_generated=[]):
 	endings = ['gmail', 'mail', 'yandex']
 	domens = ['ru', 'com', 'ua']
-	max_length = 200
+	max_length = 20
 	min_length = 5
 
 	while True:
@@ -53,6 +53,7 @@ if __name__ == '__main__':
 	COFFEE_AMOUNT = 440
 	PERSON_AMOUNT = 10_000
 	STD_AMOUNT = 100
+	PRODUCTS_AMOUNT = 453
 
 	adress_amount = 0
 	with open("data_adr.csv", 'r', encoding='utf-8') as f:
@@ -152,32 +153,42 @@ if __name__ == '__main__':
 		for s in f.readlines():
 			id+=1
 			arr = s.replace("\n","").split(";")
+			table_name = "кофе"
+			fields = ['id_товара','тип','состояние','id_автора']
+			values = [arr[0],arr[1],choice(state),choice(range(PERSON_AMOUNT))]
+			insert_into(table_name, fields, values)
 			for i in range(choice(range(1,10))):
 				table_name = "компонент_кофе"
 				fields = ['id_кофе','id_ингредиента','количество','порядок_добавления']
 				values = [str(id), str(i) ,choice(range(20)), choice(range(10)), str(i)]
 				insert_into(table_name, fields, values)
-			table_name = "кофе"
-			fields = ['id_товара','тип','состояние','id_автора']
-			values = [arr[0],arr[1],choice(state),choice(range(PERSON_AMOUNT))]
-			insert_into(table_name, fields, values)
+
 
 	state = ['формируется','готовится','готов','получен']
-	for j in range(1000):
-		itog_cost = 0
+	for order_number in range(1,STD_AMOUNT):
+		component = []
+		result_cost = 0
 		for i in range(choice(range(10))):
-			table_name = "компонент_заказа"
-			fields = ['номер_заказа','id_товара']
-			cost = products[choice(range(21))]['price']
-			itog_cost += cost 
-			values = [j, cost]
-			insert_into(table_name, fields,values)
-		table_name = "заказ"
-		fields = ['статус','клиент','кофейня','скидка','общая_стоимсоть']
+			id_product = choice(range(1,PRODUCTS_AMOUNT))
+			result_cost += products[id_product]['price'] 
+			values = [order_number, id_product]
+			component.append(values)
 		discount = round(random(), 2)
-		itog_cost -= itog_cost*discount
-		values = [choice(state),choice(range(PERSON_AMOUNT)),choice(range(100)),discount,itog_cost]
+		result_cost -= result_cost*discount
+		table_name = "заказ"
+		fields = ['статус','клиент','кофейня','скидка','общая_стоимость']
+		values = [
+			choice(state),
+			choice(range(PERSON_AMOUNT)),
+			choice(range(STD_AMOUNT)),
+			discount,result_cost
+		]
 		insert_into(table_name, fields,values)
+		table_name = "компонент_заказа"
+		fields = ['номер_заказа','id_товара']
+		for i in component:
+			insert_into(table_name, fields,i)
+
 
 	with open("ingredients.csv", 'r', encoding='utf-8') as f:
 		table_name = "ингредиенты"
@@ -193,6 +204,10 @@ if __name__ == '__main__':
 	state = ['редакция', 'опубликовано', 'скрыто']
 	for i in range(STD_AMOUNT):
 		id += 1
+		table_name = "расписание"
+		fields = ['id_клиента','состояние']
+		values = [choice(range(PERSON_AMOUNT)),choice(state)]
+		insert_into(table_name, fields, values)
 		for j in range(7):
 			table_name = "компонент_расписания"
 			fields = ['id_расписания','id_кофе','день_недели','время']
@@ -202,11 +217,7 @@ if __name__ == '__main__':
 				choice(range(1,8)),
 				f"{choice(range(START_WORK, END_WORK+1))}:{choice(range(59))}"
 			]
-			insert_into(table_name, fields, values)
-		table_name = "расписание"
-		fields = ['id_клиента','состояние']
-		values = [choice(range(PERSON_AMOUNT)),choice(state)]
-		insert_into(table_name, fields, values)
+			insert_into(table_name, fields, values)		
 
 	for i in range(STD_AMOUNT):
 		table_name = "список_любимых_кофе"
