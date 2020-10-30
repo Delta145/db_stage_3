@@ -5,10 +5,15 @@ from random import random, choice
 from string import ascii_letters
 
 
-def insert_into(table, fields, values):
-	command = f'INSERT INTO {table} ({", ".join(fields)}) VALUES ({", ".join(values)});'
-	subprocess.run(['psql', f'--command={command}'])
+# def insert_into(table, fields, values):
+# 	command = f'INSERT INTO {table} ({", ".join(fields)}) VALUES ({", ".join(values)});'
+# 	subprocess.run(['psql', f'--command={command}'])
 
+def insert_into(table, fields, values):
+	values = [str(v) for v in values]
+	command = f'INSERT INTO {table} ({", ".join(fields)}) VALUES ({", ".join(values)});\n'
+	with open('insert_script.sql', 'a', encoding='utf-8') as f:
+		f.write(command)
 
 def generate_random_email(already_generated=[]):
 	endings = ['gmail', 'mail', 'yandex']
@@ -29,7 +34,7 @@ def generate_random_email(already_generated=[]):
 
 
 def generate_random_phone(already_generated=[]):
-	numbers = "".join([a for a in range(10)])
+	numbers = "".join([str(a) for a in range(10)])
 	length = 11
 
 	while True:
@@ -43,6 +48,8 @@ def generate_random_phone(already_generated=[]):
 
 
 if __name__ == '__main__':
+	with open('insert_script.sql', 'w') as f:
+		f.write('')
 	COFFEE_AMOUNT = 440
 	PERSON_AMOUNT = 10_000
 	STD_AMOUNT = 100
@@ -56,8 +63,7 @@ if __name__ == '__main__':
 			table_name = "адрес"
 			fields = ['страна','субъект','муниципальный_район','поселение','населенный_пункт','планировочная_структура','улица','номер_земельного_участка','номер_здания','номер_помещения']
 			values = ["\'Российская Федерация\'", *arr]
-			#insert_into(table_name, fields, values)
-			print(arr)
+			insert_into(table_name, fields, values)
 
 	names = []
 	surnames = []
@@ -78,7 +84,8 @@ if __name__ == '__main__':
 	SEVENTY_YEARS_DAYS = 365 * 70
 
 	def person_generator(num):
-		for i, p, s in enumerate(product(names, surnames)):
+		for i, ps in enumerate(product(names, surnames)):
+			p, s = ps
 			yield {
 				'имя': p['name'],
 				'фамилия': s,
@@ -88,7 +95,7 @@ if __name__ == '__main__':
 				)).strftime('%Y-%m-%d'),
 				'email': generate_random_email(),
 				'id_адреса': int(random() * (adress_amount-100)) + 100, 
-				'телефон' generate_random_phone()
+				'телефон': generate_random_phone()
 			}
 			if i >= num:
 				break
@@ -102,7 +109,7 @@ if __name__ == '__main__':
 	for i in range(100):
 		table_name = "кофейня"
 		fields = ['адрес','телефон']
-		values = [i,generate_random_phone()]
+		values = [str(i), generate_random_phone()]
 		insert_into(table_name, fields, values)
 
 	products = []
@@ -123,7 +130,7 @@ if __name__ == '__main__':
 		for s in f.readlines():
 			cost = choice(range(90,300))
 			arr = s.replace("\n","").split(";")
-			values = [f"'{arr[0]}'", cost]
+			values = [arr[0], cost]
 			products.append({
 				'name': arr[0],
 				'price': int(cost)
@@ -141,14 +148,14 @@ if __name__ == '__main__':
 
 	state = ['редакция', 'опубликовано', 'скрыто']
 	id = 0
-	with open("coffe.csv", 'r', encoding='utf-8') as f:
+	with open("coffee.csv", 'r', encoding='utf-8') as f:
 		for s in f.readlines():
-			id++
+			id+=1
 			arr = s.replace("\n","").split(";")
 			for i in range(choice(range(1,10))):
 				table_name = "компонент_кофе"
 				fields = ['id_кофе','id_ингредиента','количество','порядок_добавления']
-				values = [id,i,choice(range(20)),choice(range(10)),i]
+				values = [str(id), str(i) ,choice(range(20)), choice(range(10)), str(i)]
 				insert_into(table_name, fields, values)
 			table_name = "кофе"
 			fields = ['id_товара','тип','состояние','id_автора']
@@ -158,7 +165,7 @@ if __name__ == '__main__':
 	state = ['формируется','готовится','готов','получен']
 	for j in range(1000):
 		itog_cost = 0
-		for i in choice(range(10)):
+		for i in range(choice(range(10))):
 			table_name = "компонент_заказа"
 			fields = ['номер_заказа','id_товара']
 			cost = products[choice(range(21))]['price']
@@ -185,7 +192,7 @@ if __name__ == '__main__':
 	id = 0
 	state = ['редакция', 'опубликовано', 'скрыто']
 	for i in range(STD_AMOUNT):
-		id++
+		id += 1
 		for j in range(7):
 			table_name = "компонент_расписания"
 			fields = ['id_расписания','id_кофе','день_недели','время']
@@ -217,8 +224,8 @@ if __name__ == '__main__':
 	MAX_SCORE = 5
 	id = 0
 	with open("adjectives.csv", 'r', encoding='utf-8') as f:
-		for i in range(STD_AMOUNT/2):
-			id++
+		for i in range(50):
+			id += 1
 			table_name = "оценка"
 			fields = ['оценка','отзыв']
 			values = [
@@ -233,7 +240,7 @@ if __name__ == '__main__':
 				choice(range(COFFEE_AMOUNT))
 			]
 			insert_into(table_name, fields, values)
-		for i in range(STD_AMOUNT/2,STD_AMOUNT):
+		for i in range(50,100):
 			table_name = "оценка"
 			fields = ['оценка','отзыв']
 			values = [
