@@ -46,6 +46,8 @@ def generate_random_phone(already_generated=[]):
 			already_generated.append(phone)
 			return phone
 
+def getRandomDate(start_date,interval_days):
+	return (datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=int(random() * interval_days))).strftime('%Y-%m-%d')
 
 if __name__ == '__main__':
 	with open('insert_script.sql', 'w') as f:
@@ -54,6 +56,8 @@ if __name__ == '__main__':
 	PERSON_AMOUNT = 10_000
 	STD_AMOUNT = 100
 	PRODUCTS_AMOUNT = 453
+	START_WORK = 8
+	END_WORK = 20
 
 	adress_amount = 0
 	with open("data_adr.csv", 'r', encoding='utf-8') as f:
@@ -107,7 +111,7 @@ if __name__ == '__main__':
 		values = [f'\'{i}\'' for i in s.values()]
 		insert_into(table_name, fields, values)
 
-	for i in range(100):
+	for i in range(STD_AMOUNT):
 		table_name = "кофейня"
 		fields = ['адрес','телефон']
 		values = [str(i), generate_random_phone()]
@@ -176,12 +180,14 @@ if __name__ == '__main__':
 		discount = round(random(), 2)
 		result_cost -= result_cost*discount
 		table_name = "заказ"
-		fields = ['статус','клиент','кофейня','скидка','общая_стоимость']
+		fields = ['статус','клиент','кофейня','скидка','общая_стоимость','время']
 		values = [
 			choice(state),
 			choice(range(PERSON_AMOUNT)),
 			choice(range(STD_AMOUNT)),
-			discount,result_cost
+			discount,result_cost,
+			f"{getRandomDate('2015-01-01',5*365)} {choice(range(START_WORK, END_WORK+1))}:{choice(range(59))}"
+
 		]
 		insert_into(table_name, fields,values)
 		table_name = "компонент_заказа"
@@ -195,11 +201,10 @@ if __name__ == '__main__':
 		fields = ['название','стоимость','количество']
 		for s in f.readlines():
 			arr = s.replace("\n","").split(";")
-			values = [arr[0],arr[1],arr[2]]
+			values = arr[:3]
 			insert_into(table_name, fields, values)
 
-	START_WORK = 8
-	END_WORK = 20
+	
 	id = 0
 	state = ['редакция', 'опубликовано', 'скрыто']
 	for i in range(STD_AMOUNT):
@@ -210,10 +215,10 @@ if __name__ == '__main__':
 		insert_into(table_name, fields, values)
 		for j in range(7):
 			table_name = "компонент_расписания"
-			fields = ['id_расписания','id_кофе','день_недели','время']
+			fields = ['id_расписания','id_заказа','день_недели','время']
 			values = [
 				id,
-				choice(range(COFFEE_AMOUNT)),
+				choice(range(1,STD_AMOUNT)),
 				choice(range(1,8)),
 				f"{choice(range(START_WORK, END_WORK+1))}:{choice(range(59))}"
 			]
@@ -222,7 +227,10 @@ if __name__ == '__main__':
 	for i in range(STD_AMOUNT):
 		table_name = "список_любимых_кофе"
 		fields = ['id_клиента','id_кофе']
-		values = [choice(range(PERSON_AMOUNT)),choice(range(COFFEE_AMOUNT))]
+		values = [
+			choice(range(PERSON_AMOUNT)),
+			choice(range(COFFEE_AMOUNT))
+		]
 		insert_into(table_name, fields, values)
 
 	for i in range(STD_AMOUNT):
