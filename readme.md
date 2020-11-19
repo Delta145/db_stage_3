@@ -1,0 +1,1 @@
+выполнение скрипта на гелиосе  `psql -h pg -d studs -a -f ./insert_script.sql`
