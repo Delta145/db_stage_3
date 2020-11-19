@@ -185,7 +185,7 @@ if __name__ == '__main__':
         discount = round(random(), 2)
         result_cost -= result_cost * discount
         table_name = "заказ"
-        fields = ['статус', 'клиент', 'кофейня', 'скидка', 'общая_стоимость', 'время']
+        fields = ['статус_заказа', 'id_клиента', 'id_кофейни', 'скидка', 'стоимость', 'время_формирования']
         values = [
             choice(state),
             choice(range(PERSON_AMOUNT)),
