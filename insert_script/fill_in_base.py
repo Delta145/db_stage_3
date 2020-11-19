@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
     with open("ingredients.csv", 'r', encoding='utf-8') as f:
         table_name = "ингредиенты"
-        fields = ['название', 'стоимость', 'количество']
+        fields = ['название', 'стоимость', 'количество_мл']
         for s in f.readlines():
             arr = s.replace("\n", "").split(";")
             values = arr[:3]
