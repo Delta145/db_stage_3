@@ -1,15 +1,16 @@
 CREATE TABLE адрес
 (
-    id                               SERIAL PRIMARY KEY,
-    страна                           TEXT,
-    субъект                          TEXT,
-    муниципальный_район              TEXT,
-    городское_или_сельское_поселение TEXT,
-    планировочная_структура          TEXT,
-    улица                            TEXT,
-    номер_земельного_участка         TEXT,
-    номер_здания                     TEXT,
-    номер_помещения                  TEXT
+    id                       SERIAL PRIMARY KEY,
+    страна                   TEXT,
+    субъект                  TEXT,
+    муниципальный_район      TEXT,
+    поселение                TEXT,
+    населенный_пункт         TEXT,
+    планировочная_структура  TEXT,
+    улица                    TEXT,
+    номер_земельного_участка TEXT,
+    номер_здания             TEXT,
+    номер_помещения          TEXT
 );
 
 CREATE TABLE кофейня
@@ -24,7 +25,6 @@ CREATE TABLE товар
     id        SERIAL PRIMARY KEY,
     название  TEXT NOT NULL,
     стоимость REAL,
-    вес       FLOAT,
     фото      BYTEA
 );
 
@@ -32,8 +32,9 @@ CREATE TABLE десерт
 (
     id        INTEGER PRIMARY KEY,
     id_товара INTEGER REFERENCES товар (id) ON DELETE CASCADE NOT NULL UNIQUE,
-    калории   FLOAT                                           NOT NULL
-        CONSTRAINT товар CHECK (id = id_товара)
+    калории   FLOAT                                           NOT NULL,
+    вес       FLOAT,
+    CONSTRAINT товар CHECK (id = id_товара)
 );
 
 CREATE TABLE клиент
@@ -53,8 +54,8 @@ CREATE TABLE кофе
     id        INTEGER PRIMARY KEY,
     id_товара INTEGER REFERENCES товар (id) ON DELETE CASCADE NOT NULL UNIQUE,
     тип       CHAR                                            NOT NULL CHECK (тип IN ('u', 's') ),
-    id_автора INTEGER REFERENCES клиент (id)                  NOT NULL,
-    состояние TEXT                                            NOT NULL
+    состояние TEXT                                            NOT NULL,
+    id_автора INTEGER REFERENCES клиент (id)                  NOT NULL
         CONSTRAINT товар CHECK (id = id_автора)
 );
 
@@ -81,9 +82,9 @@ CREATE TABLE заказ
     статус_заказа      CHAR(1)                         NOT NULL,
     id_клиента         INTEGER REFERENCES клиент (id)  NOT NULL,
     id_кофейни         INTEGER REFERENCES кофейня (id) NOT NULL,
+    скидка             FLOAT CHECK (скидка >= 0.0 AND скидка <= 100),
     стоимость          FLOAT,
-    время_формирования TIMESTAMP                       NOT NULL,
-    скидка             FLOAT CHECK (скидка >= 0.0 AND скидка <= 100)
+    время_формирования TIMESTAMP
 );
 
 CREATE TABLE компонент_заказа
@@ -96,7 +97,7 @@ CREATE TABLE компонент_заказа
 CREATE TABLE расписание
 (
     id         SERIAL PRIMARY KEY,
-    название   VARCHAR(32)                    NOT NULL,
+    название   VARCHAR(32),
     id_клиента INTEGER REFERENCES клиент (id) NOT NULL,
     описание   TEXT,
     состояние  TEXT                           NOT NULL
@@ -105,7 +106,7 @@ CREATE TABLE расписание
 CREATE TABLE запись_расписания
 (
     id            SERIAL PRIMARY KEY,
-    название      TEXT                                                 NOT NULL,
+    название      TEXT                                                 ,
     id_расписания INTEGER REFERENCES расписание (id) ON DELETE CASCADE NOT NULL,
     id_заказа     INTEGER REFERENCES заказ (id)                        NOT NULL,
     день_недели   INTEGER                                              NOT NULL,
