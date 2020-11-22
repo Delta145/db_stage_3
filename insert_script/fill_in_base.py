@@ -121,7 +121,7 @@ if __name__ == '__main__':
     for i in range(STD_AMOUNT):
         table_name = "кофейня"
         fields = ['id_адреса', 'телефон']
-        values = [str(i), generate_random_phone()]
+        values = [str(i+1), generate_random_phone()]
         insert_into(table_name, fields, values, 'insert_coffee_stores.sql')
 
     products = []
@@ -158,10 +158,8 @@ if __name__ == '__main__':
             insert_into(table_name, fields, values, 'insert_desserts.sql')
 
     state = ['редакция', 'опубликовано', 'скрыто']
-    id = 13
     with open("coffee.csv", 'r', encoding='utf-8') as f:
         for s in f.readlines():
-            id += 1
             arr = s.replace("\n", "").split(";")
             table_name = "кофе"
             fields = ['id', 'id_товара', 'тип', 'состояние', 'id_автора']
@@ -170,10 +168,10 @@ if __name__ == '__main__':
             # состав кофе
             table_name = "компонент_кофе"
             fields = ['id_кофе', 'id_ингредиента', 'количество', 'порядок_добавления']
-            values = [str(id), 1, choice(range(1, 3)), 0]
+            values = [str(arr[0]), 1, choice(range(1, 3)), 0]
             insert_into(table_name, fields, values, 'insert_coffee_components.sql')
             for i in range(1, choice(range(2, 10))):
-                values = [str(id), choice(range(2, 28)), choice(range(1, 10)), str(i)]
+                values = [str(arr[0]), choice(range(2, 28)), choice(range(1, 10)), str(i)]
                 insert_into(table_name, fields, values, 'insert_coffee_components.sql')
 
     state = ['формируется', 'готовится', 'готов', 'получен']

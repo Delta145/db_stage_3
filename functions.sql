@@ -12,8 +12,8 @@ CREATE OR REPLACE FUNCTION createDessert(name text, price float, calories float,
 DECLARE
 ret int;
 BEGIN
-	INSERT INTO товар(название, стоимость, вес) VALUES(name, price, weight) RETURNING id INTO ret;
-	INSERT INTO десерт(id, id_товара, калории) VALUES(ret, ret, calories);
+	INSERT INTO товар(название, стоимость) VALUES(name, price) RETURNING id INTO ret;
+	INSERT INTO десерт(id, id_товара, калории, вес) VALUES(ret, ret, calories, weight);
 	RETURN 'Десерт добавлен, id - ' || ret;
 END;
 $$ LANGUAGE 'plpgsql';
@@ -42,7 +42,7 @@ CREATE OR REPLACE FUNCTION copySchedule(schedule int, client int) RETURNS INT ST
 DECLARE
 newSchedId int;
 BEGIN
-INSERT INTO расписание(название, id_клиента, описание, состояние) SELECT название, client, описание, 'E'  FROM расписание WHERE id =  schedule RETURNING id INTO newSchedId;
+INSERT INTO расписание(название, id_клиента, описание, состояние) SELECT название, client, описание, 'E'  FROM расписание WHERE id = schedule RETURNING id INTO newSchedId;
 	INSERT INTO запись_расписания(название, id_расписания, id_заказа, день_недели, время) SELECT название, newSchedId, id_заказа, день_недели, время FROM запись_расписания WHERE id_расписания = schedule;
 	RETURN newSchedId;
 END;
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION copyCoffee(coffee int, author int) RETURNS INT STRICT
 DECLARE
 newCoffeeId int;
 BEGIN
-    INSERT INTO товар(название, стоимость, вес, фото) SELECT название, стоимость, вес, фото FROM товар WHERE товар = coffee RETURNING id INTO newCoffeeId;
+    INSERT INTO товар(название, стоимость, фото) SELECT название, стоимость, фото FROM товар WHERE id = coffee RETURNING id INTO newCoffeeId;
     INSERT INTO кофе(id, id_товара, тип, id_автора, состояние) VALUES (newCoffeeId, newCoffeeId, 'u', author, 'e');
 	INSERT INTO компонент_кофе(id_кофе, id_ингредиента, количество, порядок_добавления) SELECT newCoffeeId, id_ингредиента, количество, порядок_добавления FROM компонент_кофе WHERE id_кофе = coffee;
 	RETURN newCoffeeId;
